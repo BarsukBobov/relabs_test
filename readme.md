@@ -3,6 +3,7 @@
 Установка пакетов:
 ```
 pip install -r requirements.txt
+cd app
 ```
 Запуск клиента:
 ```
