@@ -15,20 +15,21 @@ html = """
             <input type="text" id="messageText" autocomplete="off"/>
             <button>Send</button>
         </form>
-        <ol id='messages'>
+        <ol style="list-style-type: none;" id='messages'>
         </ol>
         <script>
             var ws = new WebSocket("ws://localhost:8000/ws");
             ws.onmessage = function(event) {
+                let ws_data=JSON.parse(event.data)
                 var messages = document.getElementById('messages')
                 var message = document.createElement('li')
-                var content = document.createTextNode(event.data)
+                var content = document.createTextNode(`${ws_data.id}. ${ws_data.message}`)
                 message.appendChild(content)
                 messages.appendChild(message)
             };
             function sendMessage(event) {
                 var input = document.getElementById("messageText")
-                ws.send(input.value)
+                ws.send(JSON.stringify({message: input.value}))
                 input.value = ''
                 event.preventDefault()
             }
@@ -46,6 +47,13 @@ async def get():
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+    i=0
     while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(data)
+        data = await websocket.receive_json()
+        i+=1
+        await websocket.send_json(
+            {
+                "id": i,
+                "message": data["message"],
+            }
+        )
