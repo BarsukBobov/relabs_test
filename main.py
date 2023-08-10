@@ -29,7 +29,7 @@ html = """
             };
             function sendMessage(event) {
                 var input = document.getElementById("messageText")
-                ws.send(JSON.stringify({message: input.value}))
+                input.value?ws.send(JSON.stringify({message: input.value})):null
                 input.value = ''
                 event.preventDefault()
             }
